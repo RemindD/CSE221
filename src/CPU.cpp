@@ -8,6 +8,8 @@
 #include <vector>
 #include "rdtsc.h"
 #include "utilities.h"
+#include <sys/types.h>
+#include <pthread.h>
 
 #define LOOP_TIMES 100000
 #define REPEAT_TIMES 10
@@ -105,6 +107,93 @@ void getProcedureOverhead(std::vector<double> &overhead){
         sum += (end - start);
     }
     overhead.push_back(sum / (double)LOOP_TIMES);
+}
+
+double getSystemCallOverhead() {
+    uint64_t start, end;
+    int SUC_TIMES = 0;
+    pid_t pid;
+    double sum = 0;
+    for (int i=0; i<LOOP_TIMES; ++i) {
+        switch (pid = fork()) {
+            case -1:
+                exit(-1);
+                break;
+            case 0:
+                start = rdtsc();
+                getpid();
+                end = rdtsc();
+                sum += (end - start);
+                SUC_TIMES++;
+                exit(0);
+            default:
+        }
+    }
+    return sum / (double)SUC_TIMES;
+}
+// Test for cache of system call
+double getSystemCallOverhead2() {
+    uint64_t start, end;
+    double sum = 0;
+    for (int i=0; i<LOOP_TIMES; ++i) {
+        start = rdtsc();
+        getpid();
+        end = rdtsc();
+        sum += (end - start);
+    }
+    return sum / (double)LOOP_TIMES;
+}
+
+void newThread(void) { pthread_exit(NULL); }
+
+double getThreadCreationOverhead() {
+    uint64_t start, end;
+    pthread_t threadId;
+    double sum = 0;
+    for (int i=0; i<LOOP_TIMES; ++i) {
+        start = rdtsc();
+        pthread_create(&threadId, NULL, (void *)newThread, NULL);
+        end = rdtsc();
+        sum += (end - start);
+    }
+    return sum / (double)LOOP_TIMES;
+}
+// Test for succeed create
+double getThreadCreationOverhead2() {
+    uint64_t start, end;
+    pthread_t threadId;
+    int SUC_TIMES = 0, res;
+    double sum = 0;
+    for (int i=0; i<LOOP_TIMES; ++i) {
+        start = rdtsc();
+        res = pthread_create(&threadId, NULL, (void *)newThread, NULL);
+        end = rdtsc();
+        if (res==0) {
+            sum += (end - start);
+            SUC_TIMES++;
+        }
+    }
+    return sum / (double)SUC_TIMES;
+}
+
+double getProcessCreationOverhead() {
+    uint64_t start, end;
+    int SUC_TIMES = 0;
+    pid_t pid;
+    double sum = 0;
+    for (int i=0; i<LOOP_TIMES; ++i) {
+        start = rdtsc();
+        switch (pid = fork()) {
+            case 0:
+                exit(1);
+            case 1:
+                wait(NULL);
+                end = rdtsc();
+                sum += (end - start);
+                SUC_TIMES++;
+        }
+    }
+    return sum / (double)SUC_TIMES;
 }
 
 int main() {

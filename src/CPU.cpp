@@ -210,5 +210,27 @@ int main() {
     for (int i=0; i<8; ++i) {
         printf("The average ovehead of a function with %d integer arguments is %f\n", i, procedureOverhead[i]);
     }
+
+    for (int i=0; i<REPEAT_TIMES; ++i) {
+        printf("system call overhead for %d times is %f\n", i, getSystemCallOverhead());
+    }
+
+    for (int i=0; i<REPEAT_TIMES; ++i) {
+        printf("system call overhead2 for %d times is %f\n", i, getSystemCallOverhead2());
+    }
+
+    for (int i=0; i<REPEAT_TIMES; ++i) {
+        printf("thread creation overhead for %d times is %f\n", i, getThreadCreationOverhead());
+    }
+
+    for (int i=0; i<REPEAT_TIMES; ++i) {
+        printf("thread creation overhead2 for %d times is %f\n", i, getThreadCreationOverhead2());
+    }
+
+    for (int i=0; i<REPEAT_TIMES; ++i) {
+        printf("process creation overhead for %d times is %f\n", i, getProcessCreationOverhead());
+    }
+
+
     return 0;
 }

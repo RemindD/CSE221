@@ -1,8 +1,6 @@
 //
 // Created by Xingdong Li on 4/22/17.
 //
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -10,6 +8,7 @@
 #include "utilities.h"
 #include <sys/types.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #define LOOP_TIMES 100000
 #define REPEAT_TIMES 10
@@ -131,6 +130,7 @@ double getSystemCallOverhead() {
     }
     return sum / (double)SUC_TIMES;
 }
+
 // Test for cache of system call
 double getSystemCallOverhead2() {
     uint64_t start, end;
@@ -144,7 +144,7 @@ double getSystemCallOverhead2() {
     return sum / (double)LOOP_TIMES;
 }
 
-void newThread(void) { pthread_exit(NULL); }
+void* newThread(void*) { pthread_exit(NULL); }
 
 double getThreadCreationOverhead() {
     uint64_t start, end;
@@ -152,7 +152,7 @@ double getThreadCreationOverhead() {
     double sum = 0;
     for (int i=0; i<LOOP_TIMES; ++i) {
         start = rdtsc();
-        pthread_create(&threadId, NULL, (void *)newThread, NULL);
+        pthread_create(&threadId, NULL, newThread, NULL);
         end = rdtsc();
         sum += (end - start);
     }
@@ -166,7 +166,7 @@ double getThreadCreationOverhead2() {
     double sum = 0;
     for (int i=0; i<LOOP_TIMES; ++i) {
         start = rdtsc();
-        res = pthread_create(&threadId, NULL, (void *)newThread, NULL);
+        res = pthread_create(&threadId, NULL, newThread, NULL);
         end = rdtsc();
         if (res==0) {
             sum += (end - start);

@@ -110,30 +110,6 @@ void getProcedureOverhead(std::vector<double> &overhead){
 
 double getSystemCallOverhead() {
     uint64_t start, end;
-    int SUC_TIMES = 0;
-    pid_t pid;
-    double sum = 0;
-    for (int i=0; i<LOOP_TIMES; ++i) {
-        switch (pid = fork()) {
-            case -1:
-                exit(-1);
-                break;
-            case 0:
-                start = rdtsc();
-                getpid();
-                end = rdtsc();
-                sum += (end - start);
-                SUC_TIMES++;
-                exit(0);
-            default:
-        }
-    }
-    return sum / (double)SUC_TIMES;
-}
-
-// Test for cache of system call
-double getSystemCallOverhead2() {
-    uint64_t start, end;
     double sum = 0;
     for (int i=0; i<LOOP_TIMES; ++i) {
         start = rdtsc();
@@ -153,27 +129,11 @@ double getThreadCreationOverhead() {
     for (int i=0; i<LOOP_TIMES; ++i) {
         start = rdtsc();
         pthread_create(&threadId, NULL, newThread, NULL);
+        pthread_join(threadId, NULL);
         end = rdtsc();
         sum += (end - start);
     }
     return sum / (double)LOOP_TIMES;
-}
-// Test for succeed create
-double getThreadCreationOverhead2() {
-    uint64_t start, end;
-    pthread_t threadId;
-    int SUC_TIMES = 0, res;
-    double sum = 0;
-    for (int i=0; i<LOOP_TIMES; ++i) {
-        start = rdtsc();
-        res = pthread_create(&threadId, NULL, newThread, NULL);
-        end = rdtsc();
-        if (res==0) {
-            sum += (end - start);
-            SUC_TIMES++;
-        }
-    }
-    return sum / (double)SUC_TIMES;
 }
 
 double getProcessCreationOverhead() {
@@ -184,13 +144,16 @@ double getProcessCreationOverhead() {
     for (int i=0; i<LOOP_TIMES; ++i) {
         start = rdtsc();
         switch (pid = fork()) {
-            case 0:
-                exit(1);
-            case 1:
-                wait(NULL);
-                end = rdtsc();
-                sum += (end - start);
-                SUC_TIMES++;
+        case -1:
+            exit(-1);
+            break;
+        case 0:
+            exit(0);
+        default:
+            wait(NULL);
+            end = rdtsc();
+            sum += (end - start);
+            SUC_TIMES++;
         }
     }
     return sum / (double)SUC_TIMES;
@@ -208,15 +171,11 @@ int main() {
     std::vector<double> procedureOverhead;
     getProcedureOverhead(procedureOverhead);
     for (int i=0; i<8; ++i) {
-        printf("The average ovehead of a function with %d integer arguments is %f\n", i, procedureOverhead[i]);
+        printf("The average overhead of a function with %d integer arguments is %f\n", i, procedureOverhead[i]);
     }
 
     for (int i=0; i<REPEAT_TIMES; ++i) {
-        printf("system call overhead for %d times is %f\n", i, getSystemCallOverhead());
-    }
-
-    for (int i=0; i<REPEAT_TIMES; ++i) {
-        printf("system call overhead2 for %d times is %f\n", i, getSystemCallOverhead2());
+        printf("system call overhead for %d times is %f\n", i, getSystemCallOverhead()));
     }
 
     for (int i=0; i<REPEAT_TIMES; ++i) {
@@ -224,13 +183,7 @@ int main() {
     }
 
     for (int i=0; i<REPEAT_TIMES; ++i) {
-        printf("thread creation overhead2 for %d times is %f\n", i, getThreadCreationOverhead2());
-    }
-
-    for (int i=0; i<REPEAT_TIMES; ++i) {
         printf("process creation overhead for %d times is %f\n", i, getProcessCreationOverhead());
     }
-
-
     return 0;
 }

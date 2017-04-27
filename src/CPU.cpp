@@ -205,11 +205,13 @@ double getProcessSwitchContextOverhead() {
     double sum = 0.0;
     int times = 0;
     for (int i=0; i<LOOP_TIMES; ++i) {
+        int myPipe0[2];
+        pipe(myPipe0);
         int myPipe1[2];
         pipe(myPipe1);
         int myPipe2[2];
         pipe(myPipe2);
-        double readwrite = getReadWrite(myPipe1);
+        double readwrite = getReadWrite(myPipe0);
         double readwriteswitch = getReadWriteSwitch(myPipe1, myPipe2);
         printf("read write: %f\n", readwrite);
         printf("read write switch: %f\n", readwriteswitch);
@@ -222,31 +224,52 @@ double getProcessSwitchContextOverhead() {
     return sum / times;
 }
 
-//double getRead(int *myPipe1, int *myPipe2) {
-//    int temp = 1;
-//    read(myPipe1[0], &temp, sizeof(int));
-//}
-//
-//double getThreadSwitchContextOverhead() {
-//    int myPipe[2];
-//    pipe(myPipe);
-//    double sum = 0;
-//    int temp = 1;
-//    uint64_t start, end;
-//    pthread_t threadId;
-//
-//    pthread_create(&threadId, NULL, newThread, NULL);
-//    start = rdtsc_start();
-//    read(myPipe[0], &temp, sizeof(temp));
-//    pthread_join(threadId, NULL);
-//    end = rdtsc_end();
-//
-//    sum += (end - start);
-//
-//    double readTime = getRead(myPipe);
-//    return sum / (double)LOOP_TIMES - readTime;
-//}
+void *getRead(void *fd) {
+    int temp = 1;
+    write(*(int*)fd+1, &temp, sizeof(int));
+}
 
+double getThreadSwitch() {
+    int myPipe[2];
+    pipe(myPipe);
+    int temp = 1;
+    uint64_t start, end;
+    pthread_t threadId;
+
+    pthread_create(&threadId, NULL, getRead, &myPipe[0]);
+    start = rdtsc_start();
+    read(myPipe[0], &temp, sizeof(temp));
+    end = rdtsc_end();
+    pthread_join(threadId, NULL);
+    return end - start;
+}
+double getThreadRead() {
+    int myPipe[2];
+    pipe(myPipe);
+    int temp = 1;
+    uint64_t start, end;
+    write(myPipe[1], &temp, sizeof(int));
+    start = rdtsc_start();
+    read(myPipe[0], &temp, sizeof(temp));
+    end = rdtsc_end();
+    return end - start;
+}
+
+double getThreadSwitchContextOverhead() {
+    double sum = 0.0;
+    int times = 0;
+    for (int i=0; i<LOOP_TIMES; ++i) {
+        double readwrite = getThreadRead();
+        double readwriteswitch = getThreadSwitch();
+//        printf("read write: %f\n", readwrite);
+//        printf("read write switch: %f\n", readwriteswitch);
+        if (readwriteswitch - readwrite > 0) {
+            sum += (readwriteswitch - readwrite);
+            ++times;
+        }
+    }
+    return sum / times;
+}
 void calculateMeanVar(std::vector<double> res) {
     double sum = 0, varSum = 0;
     double mean, var;
@@ -306,14 +329,18 @@ int main() {
 
     std::vector<double> processSwitchOverhead;
     for (int i=0; i<REPEAT_TIMES; ++i) {
-        double overhead = getProcessSwitchContextOverhead();
-        processSwitchOverhead.push_back(overhead);
-
+        processSwitchOverhead.push_back(getProcessSwitchContextOverhead());
+        printf("process creation overhead for %d times is %f\n", i, processSwitchOverhead[i]);
     }
-    for (int i=0; i<processSwitchOverhead.size(); ++i) cout << processSwitchOverhead[i] << endl;
     calculateMeanVar(processSwitchOverhead);
 
+    std::vector<double> threadSwitchOverhead;
+    for (int i=0; i<REPEAT_TIMES; ++i) {
+        threadSwitchOverhead.push_back(getThreadSwitchContextOverhead());
+        printf("thread creation overhead for %d times is %f\n", i, threadSwitchOverhead[i]);
+    }
 
+    calculateMeanVar(threadSwitchOverhead);
     //printf("context switch between threads is %f\n", getThreadSwitchContextOverhead());
     return 0;
 }

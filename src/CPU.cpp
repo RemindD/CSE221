@@ -230,7 +230,6 @@ double getThreadSwitchContextOverhead() {
 
     uint64_t start, end;
     pthread_t threadId;
-    double sum = 0;
     for (int i=0; i<LOOP_TIMES; ++i) {
         pthread_create(&threadId, NULL, newThread, NULL);
         start = rdtsc_start();
@@ -242,7 +241,7 @@ double getThreadSwitchContextOverhead() {
     return sum / (double)LOOP_TIMES - readTime;
 }
 
-void calculateMeanVar(int *res) {
+void calculateMeanVar(double *res) {
     double sum = 0, varSum = 0;
     double mean, var;
     for (int i=0;i<REPEAT_TIMES; ++i) {
@@ -257,14 +256,15 @@ void calculateMeanVar(int *res) {
 }
 
 int main() {
-    int *readOverhead = new int(REPEAT_TIMES);
+
+    double *readOverhead = new double(REPEAT_TIMES);
     for (int i=0; i<REPEAT_TIMES; ++i) {
         readOverhead[i] = getReadOverhead();
         printf("read overhead for %d times is %f\n", i, readOverhead[i]);
     }
     calculateMeanVar(readOverhead);
 
-    int *loopOverhead = new int(REPEAT_TIMES);
+    double *loopOverhead = new double(REPEAT_TIMES);
     for (int i=0; i<REPEAT_TIMES; ++i) {
         loopOverhead[i] = getLoopOverhead();
         printf("loop overhead for %d times is %f\n", i, loopOverhead[i]);
@@ -279,24 +279,24 @@ int main() {
 
     printf("system call overhead is %f\n", getSystemCallOverhead());
 
-    int *threadCreationOverhead = new int(REPEAT_TIMES);
+    double *threadCreationOverhead = new double(REPEAT_TIMES);
     for (int i=0; i<REPEAT_TIMES; ++i) {
         threadCreationOverhead[i] = getThreadCreationOverhead();
         printf("thread creation overhead for %d times is %f\n", i, threadCreationOverhead[i]);
     }
     calculateMeanVar(threadCreationOverhead);
 
-    int *processCreationOverhead = new int(REPEAT_TIMES);
+    double *processCreationOverhead = new double(REPEAT_TIMES);
     for (int i=0; i<REPEAT_TIMES; ++i) {
         processCreationOverhead[i] = getProcessCreationOverhead();
         printf("process creation overhead for %d times is %f\n", i, processCreationOverhead[i]);
     }
     calculateMeanVar(processCreationOverhead);
 
-    printf("context switch between processes is %f\n", getSwitchContextOverhead());
+    printf("context switch between processes is %f\n", getProcessSwitchContextOverhead());
     printf("context switch between threads is %f\n", getThreadSwitchContextOverhead());
 
-    int *threadSwitchOverhead = new int(REPEAT_TIMES);
+    double *threadSwitchOverhead = new double(REPEAT_TIMES);
     for (int i=0; i<REPEAT_TIMES; ++i) {
         threadSwitchOverhead[i] = getThreadSwitchContextOverhead();
         printf("process creation overhead for %d times is %f\n", i, threadSwitchOverhead[i]);

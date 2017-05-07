@@ -179,8 +179,8 @@ double getReadWriteSwitch(int *myPipe1, int *myPipe2) {
     else {
         start = rdtsc_start();
         read(myPipe1[0], &temp, sizeof(int));
-        end = rdtsc_end();
         write(myPipe2[1], &temp, sizeof(int));
+        end = rdtsc_end();
     }
 
     double result = 0.0;
@@ -193,9 +193,8 @@ double getReadWriteSwitch(int *myPipe1, int *myPipe2) {
 double getReadWrite(int *myPipe) {
     uint64_t start, end;
     int temp = 1;
-
-    write(myPipe[1], &temp, sizeof(int));
     start = rdtsc_start();
+    write(myPipe[1], &temp, sizeof(int));
     read(myPipe[0], &temp, sizeof(int));
     end = rdtsc_end();
     return (double)(end - start);
@@ -213,10 +212,10 @@ double getProcessSwitchContextOverhead() {
         pipe(myPipe2);
         double readwrite = getReadWrite(myPipe0);
         double readwriteswitch = getReadWriteSwitch(myPipe1, myPipe2);
-        printf("read write: %f\n", readwrite);
-        printf("read write switch: %f\n", readwriteswitch);
+//        printf("read write: %f\n", readwrite);
+//        printf("read write switch: %f\n", readwriteswitch);
         if (readwriteswitch - readwrite > 0) {
-            sum += (readwriteswitch - readwrite);
+            sum += (readwriteswitch - readwrite*2);
             ++times;
         }
     }

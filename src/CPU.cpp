@@ -11,8 +11,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <math.h>
-#include <iostream>
-using namespace std;
+
 #define LOOP_TIMES 10
 #define REPEAT_TIMES 10
 #define LARGE_LOOP_TIMES 100000
@@ -226,6 +225,7 @@ double getProcessSwitchContextOverhead() {
 void *getRead(void *fd) {
     int temp = 1;
     write(*(int*)fd+1, &temp, sizeof(int));
+    return 0;
 }
 
 double getThreadSwitch() {

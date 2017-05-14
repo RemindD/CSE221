@@ -21,10 +21,3 @@ add_executable(MEM_measure
         ${task2}
         include/rdtsc.h
         include/utilities.h)
-set(task2_2 src/MEM_bandwidth.cpp)
-add_executable(MEM_bandwidth
-        ${task2_2}
-        include/rdtsc.h
-        include/utilities.h)
-# add_executable(src/task1.cpp)
-# add_executable(Tutorial tutorial.cxx)

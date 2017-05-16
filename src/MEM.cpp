@@ -120,7 +120,7 @@ void getPageFaultTime() {
 }
 
 int main() {
-    long stride[6] = {4, 16, 64, 256, 1028, 4096};
+    long stride[6] = {4, 16, 64, 256, 1024, 4096};
     long size[20];
     size[0] = 4096;
     for (int i=0; i<20; ++i) {

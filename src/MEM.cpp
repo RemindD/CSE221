@@ -16,7 +16,7 @@
 #include <ctime>
 using namespace std;
 #define LOOP_TIMES 10
-#define LARGE_LOOP_TIMES 100
+#define LARGE_LOOP_TIMES 1000
 
 double getMemoryAccessTime(long size, long stride) {
     long array_size = size / 8;
@@ -123,21 +123,21 @@ int main() {
     long stride[6] = {4, 16, 64, 256, 1028, 4096};
     long size[20];
     size[0] = 4096;
-    for (int i=0; i<16; ++i) {
+    for (int i=0; i<20; ++i) {
         size[i+1] = size[i] * 2;
     }
     double *memoryAccessTime = new double [20];
     for (int j=0; j<6; ++j) {
-        for (int i = 0; i < 16; ++i) {
+        for (int i = 0; i < 20; ++i) {
             memoryAccessTime[i] = getMemoryAccessTime(size[i], stride[j]);
             printf("%f\n", memoryAccessTime[i]);
         }
         printf("------------------------------\n");
     }
-    getMemoryBindwidth();
-    createFile();
-    for (int i=0; i<LOOP_TIMES; ++i) {
-        getPageFaultTime();
-    }
-    return 0;
+//    getMemoryBindwidth();
+//    createFile();
+//    for (int i=0; i<LOOP_TIMES; ++i) {
+//        getPageFaultTime();
+//    }
+//    return 0;
 }

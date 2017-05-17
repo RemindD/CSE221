@@ -19,8 +19,8 @@ using namespace std;
 #define LARGE_LOOP_TIMES 1000
 
 double getMemoryAccessTime(long size, long stride) {
-    long array_size = size / 8;
-    long array_stride = stride / 8;
+    long array_size = size / 4;
+    long array_stride = stride / 4;
     long* data = (long*)malloc(array_size * sizeof(long));
     for (long i=0; i<array_size; ++i) {
         data[i] = (i+array_stride) % array_size;
@@ -123,12 +123,12 @@ int main() {
     long stride[6] = {4, 16, 64, 256, 1024, 4096};
     long size[20];
     size[0] = 4096;
-    for (int i=0; i<20; ++i) {
+    for (int i=0; i<16; ++i) {
         size[i+1] = size[i] * 2;
     }
     double *memoryAccessTime = new double [20];
     for (int j=0; j<6; ++j) {
-        for (int i = 0; i < 20; ++i) {
+        for (int i = 0; i < 16; ++i) {
             memoryAccessTime[i] = getMemoryAccessTime(size[i], stride[j]);
             printf("%f\n", memoryAccessTime[i]);
         }

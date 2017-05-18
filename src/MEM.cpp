@@ -110,9 +110,10 @@ void getPageFaultTime() {
         return;
     }
     close(f);
+    rdtsc_start();
     start = rdtsc_start();
-    for (int i=0; i<8192; ++i) {
-        m[i*8192] = 'A';
+    for (int i=0; i<16384; ++i) {
+        m[i*4096] = 'A';
     }
     end = rdtsc_end();
     munmap(m, arraySize);
@@ -134,10 +135,8 @@ int main() {
         }
         printf("------------------------------\n");
     }
-//    getMemoryBindwidth();
-//    createFile();
-//    for (int i=0; i<LOOP_TIMES; ++i) {
-//        getPageFaultTime();
-//    }
-//    return 0;
+    getMemoryBindwidth();
+    createFile();
+    getPageFaultTime();
+    return 0;
 }

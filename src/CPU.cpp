@@ -12,9 +12,14 @@
 #include <unistd.h>
 #include <math.h>
 
+<<<<<<< Updated upstream
 #define LOOP_TIMES 10
 #define REPEAT_TIMES 10
 #define LARGE_LOOP_TIMES 100000
+=======
+#define LOOP_TIMES 100
+#define REPEAT_TIMES 100
+>>>>>>> Stashed changes
 
 double getReadOverhead() {
     double sum = 0;
@@ -23,6 +28,7 @@ double getReadOverhead() {
         start = rdtsc_start();
         end = rdtsc_end();
         sum += (end - start);
+        // printf("one cycle cost %f\n", double(end - start));
     }
     return sum / (double)LOOP_TIMES;
 }
@@ -30,9 +36,9 @@ double getReadOverhead() {
 double getLoopOverhead() {
     uint64_t start, end;
     start = rdtsc_start();
-    for (int i=0; i<LARGE_LOOP_TIMES; ++i) {}
+    for (int i=0; i<LOOP_TIMES; ++i) {}
     end = rdtsc_end();
-    return (double)(end - start) / (double)LARGE_LOOP_TIMES;
+    return (double)(end - start) / (double)LOOP_TIMES;
 }
 
 void getProcedureOverhead(std::vector<double> &overhead){
@@ -113,13 +119,45 @@ void getProcedureOverhead(std::vector<double> &overhead){
 double getSystemCallOverhead() {
     uint64_t start, end;
     double sum = 0;
+<<<<<<< Updated upstream
     for (int i=0; i<LOOP_TIMES; ++i) {
         start = rdtsc_start();
         syscall(SYS_getpid);
+=======
+
+    for (int i=0; i<LOOP_TIMES; ++i) {
+        start = rdtsc_start();
+        getpid();
+>>>>>>> Stashed changes
         end = rdtsc_end();
         sum += (end - start);
     }
     return sum / (double)LOOP_TIMES;
+<<<<<<< Updated upstream
+=======
+}
+
+void getSystemCallOverhead2() {
+    uint64_t start, end;
+    double sum = 0;
+    pid_t pid;
+    for (int i=0; i<LOOP_TIMES; ++i) {
+        pid = fork();
+        switch (pid) {
+            case -1:
+                exit(-1);
+            case 0:
+                start = rdtsc_start();
+                getpid();
+                end = rdtsc_end();
+                printf("overhead2 for system call is %f\n", end-start);
+                exit(0);
+            default:
+                wait(NULL);
+        }
+    }
+    return;
+>>>>>>> Stashed changes
 }
 
 void* newThread(void*) { pthread_exit(NULL); }
@@ -154,8 +192,10 @@ double getProcessCreationOverhead() {
             default:
                 wait(NULL);
                 end = rdtsc_end();
-                sum += (end - start);
-                SUC_TIMES++;
+                if (end > start) {
+                    sum += (end - start);
+                    SUC_TIMES++;
+                }
         }
     }
     return sum / (double)SUC_TIMES;
@@ -176,10 +216,16 @@ double getReadWriteSwitch(int *myPipe1, int *myPipe2) {
         exit(1);
     }
     else {
+<<<<<<< Updated upstream
         start = rdtsc_start();
         read(myPipe1[0], &temp, sizeof(int));
         write(myPipe2[1], &temp, sizeof(int));
         end = rdtsc_end();
+=======
+        write(myPipe[1], &temp, sizeof(int));
+        exit(1);
+        return -1;
+>>>>>>> Stashed changes
     }
 
     double result = 0.0;
@@ -196,9 +242,14 @@ double getReadWrite(int *myPipe) {
     write(myPipe[1], &temp, sizeof(int));
     read(myPipe[0], &temp, sizeof(int));
     end = rdtsc_end();
-    return (double)(end - start);
+    double result = 0.0;
+    if(end > start){
+        result = (double)(end - start);
+    }
+    return result;
 }
 
+<<<<<<< Updated upstream
 double getProcessSwitchContextOverhead() {
     double sum = 0.0;
     int times = 0;
@@ -217,10 +268,25 @@ double getProcessSwitchContextOverhead() {
             sum += (readwriteswitch - readwrite*2);
             ++times;
         }
+=======
+double getSwitchContextOverhead() {
+    int myPipe[2];
+    pipe(myPipe);
+    double sum = 0;
+
+    for (int i=0; i < 10; ++i) {
+        double readwrite = getReadWrite(myPipe);
+        double readwriteswitch = getReadWriteSwitch(myPipe);
+        printf("read write: %f\n", readwrite);
+        printf("read write switch: %f\n", readwriteswitch);
+        sum = (readwriteswitch - readwrite);
+        printf("%f\n", sum);
+>>>>>>> Stashed changes
     }
 
     return sum / times;
 }
+<<<<<<< Updated upstream
 
 void *getRead(void *fd) {
     int temp = 1;
@@ -288,22 +354,31 @@ int main() {
     for (int i=0; i<REPEAT_TIMES; ++i) {
         readOverhead.push_back(getReadOverhead());
         printf("read overhead for %d times is %f\n", i, readOverhead[i]);
+=======
+int main() {
+    for (int i=0; i<REPEAT_TIMES; ++i) {
+        printf("read overhead for %d times is %f\n", i, getReadOverhead());
+>>>>>>> Stashed changes
     }
-    calculateMeanVar(readOverhead);
 
+<<<<<<< Updated upstream
     std::vector<double> loopOverhead;
     for (int i=0; i<REPEAT_TIMES; ++i) {
         loopOverhead.push_back(getLoopOverhead());
         printf("loop overhead for %d times is %f\n", i, loopOverhead[i]);
+=======
+    for (int i=0; i<REPEAT_TIMES; ++i) {
+        printf("loop overhead for %d times is %f\n", i, getLoopOverhead());
+>>>>>>> Stashed changes
     }
-    calculateMeanVar(loopOverhead);
 
     std::vector<double> procedureOverhead;
     getProcedureOverhead(procedureOverhead);
     for (int i=0; i<8; ++i) {
-        printf("The average overhead of a function with %d integer arguments is %f\n", i, procedureOverhead[i]);
+        printf("The average ovehead of a function with %d integer arguments is %f\n", i, procedureOverhead[i]);
     }
 
+<<<<<<< Updated upstream
     std::vector<double> systemCallOverhead;
     getSystemCallOverhead();
     for (int i=0; i<REPEAT_TIMES; ++i) {
@@ -316,16 +391,26 @@ int main() {
     for (int i=0; i<REPEAT_TIMES; ++i) {
         threadCreationOverhead.push_back(getThreadCreationOverhead());
         printf("thread creation overhead for %d times is %f\n", i, threadCreationOverhead[i]);
+=======
+    for (int i=0; i<REPEAT_TIMES; ++i) {
+        printf("system call overhead for %d times is %f\n", i, getSystemCallOverhead());
+>>>>>>> Stashed changes
     }
-    calculateMeanVar(threadCreationOverhead);
 
+<<<<<<< Updated upstream
     std::vector<double> processCreationOverhead;
     for (int i=0; i<REPEAT_TIMES; ++i) {
         processCreationOverhead.push_back(getProcessCreationOverhead());
         printf("process creation overhead for %d times is %f\n", i, processCreationOverhead[i]);
-    }
-    calculateMeanVar(processCreationOverhead);
+=======
+    getSystemCallOverhead2();
 
+    for (int i=0; i<REPEAT_TIMES; ++i) {
+        printf("thread creation overhead for %d times is %f\n", i, getThreadCreationOverhead());
+>>>>>>> Stashed changes
+    }
+
+<<<<<<< Updated upstream
     std::vector<double> processSwitchOverhead;
     for (int i=0; i<REPEAT_TIMES; ++i) {
         processSwitchOverhead.push_back(getProcessSwitchContextOverhead());
@@ -338,6 +423,13 @@ int main() {
         threadSwitchOverhead.push_back(getThreadSwitchContextOverhead());
         printf("thread creation overhead for %d times is %f\n", i, threadSwitchOverhead[i]);
     }
+=======
+    for (int i=0; i<REPEAT_TIMES; ++i) {
+        printf("process creation overhead for %d times is %f\n", i, getProcessCreationOverhead());
+    }
+
+    printf("context switch between processes is %f\n", getSwitchContextOverhead());
+>>>>>>> Stashed changes
 
     calculateMeanVar(threadSwitchOverhead);
     //printf("context switch between threads is %f\n", getThreadSwitchContextOverhead());

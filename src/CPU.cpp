@@ -12,14 +12,10 @@
 #include <unistd.h>
 #include <math.h>
 
-<<<<<<< Updated upstream
 #define LOOP_TIMES 10
 #define REPEAT_TIMES 10
 #define LARGE_LOOP_TIMES 100000
-=======
-#define LOOP_TIMES 100
-#define REPEAT_TIMES 100
->>>>>>> Stashed changes
+
 
 double getReadOverhead() {
     double sum = 0;

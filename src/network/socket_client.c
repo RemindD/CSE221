@@ -11,8 +11,6 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdlib.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 
 void STOP(char * message){ perror(message); exit(1);}

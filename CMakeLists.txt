@@ -21,3 +21,13 @@ add_executable(MEM_measure
         ${task2}
         include/rdtsc.h
         include/utilities.h)
+
+set(client src/network/socket_client.c)
+add_executable(Client
+        ${client}
+        include/rdtsc.h)
+
+set(server src/network/socket_server.c)
+add_executable(Server
+        ${server}
+        include/rdtsc.h)

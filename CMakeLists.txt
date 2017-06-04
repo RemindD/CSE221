@@ -31,3 +31,8 @@ set(server src/network/socket_server.c)
 add_executable(Server
         ${server}
         include/rdtsc.h)
+
+set(file_cache src/file_system/file_cache.cpp)
+add_executable(Cache
+        ${file_cache}
+        include/rdtsc.h)

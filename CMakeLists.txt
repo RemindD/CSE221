@@ -33,6 +33,11 @@ add_executable(Server
         include/rdtsc.h)
 
 set(file_cache src/file_system/file_cache.cpp)
-add_executable(Cache
+add_executable(File_Cache
         ${file_cache}
+        include/rdtsc.h)
+
+set(file_read src/file_system/file_read.cpp)
+add_executable(File_Read
+        ${file_read}
         include/rdtsc.h)

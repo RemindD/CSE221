@@ -108,14 +108,11 @@ void read_random(char* filename) {
     printf("average is %f\n", (double)sum/num_blocks);
 }
 int main(int argc, char** argv) {
-    char *filename;
-    if (argc == 2) {
-        filename = argv[1];
-    }
-    else {
-        printf("please enter filename\n");
-        exit(1);
-    }
+    char *filename = (char*)"/Volumes/Macintosh HD/Users/richard/Documents/graduate_study/3rd_semester/CSE255/git-repo/Data/users-partition.pickle";
+    /*
+     * accessing file on local disk need file path
+     * accessing remote file need to use the file path with /Volumes/ prefix
+     */
     read_sequential(filename);
     read_random(filename);
 }

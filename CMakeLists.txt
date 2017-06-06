@@ -41,3 +41,8 @@ set(file_read src/file_system/file_read.cpp)
 add_executable(File_Read
         ${file_read}
         include/rdtsc.h)
+
+set(file_contension src/file_system/contension.cpp)
+add_executable(File_Contension
+        ${file_contension}
+        include/rdtsc.h)

@@ -138,7 +138,7 @@ int main() {
         if ((pids[i] = fork()) < 0) {
             perror("fork");
             abort();
-        } 
+        }
         else if (pids[i] == 0) {
             read_sequential(fileNames[i]);
             exit(0);

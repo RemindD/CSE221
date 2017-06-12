@@ -22,14 +22,30 @@ add_executable(MEM_measure
         include/rdtsc.h
         include/utilities.h)
 
-set(client src/network/socket_client.c)
-add_executable(Client
-        ${client}
+set(rtt_server src/network/RoundTrip_Server.c)
+add_executable(RTT_Server
+        ${rtt_server}
+        include/rdtsc.h)
+set(bd_server src/network/PeakBW_Server.c)
+add_executable(BD_Server
+        ${bd_server}
+        include/rdtsc.h)
+set(co_server src/network/ConnectOverhead_Server.c)
+add_executable(CO_Server
+        ${co_server}
         include/rdtsc.h)
 
-set(server src/network/socket_server.c)
-add_executable(Server
-        ${server}
+set(rtt_client src/network/RoundTrip_Client.c)
+add_executable(RTT_Client
+        ${rtt_client}
+        include/rdtsc.h)
+set(bd_client src/network/PeakBW_Client.c)
+add_executable(BD_Client
+        ${bd_client}
+        include/rdtsc.h)
+set(co_client src/network/ConnectOverhead_Client.c)
+add_executable(CO_Client
+        ${co_client}
         include/rdtsc.h)
 
 set(file_cache src/file_system/file_cache.cpp)

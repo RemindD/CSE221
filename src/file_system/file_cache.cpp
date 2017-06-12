@@ -20,7 +20,6 @@ int read_cache(char *filename, long long int file_size) {
     cur_size = 0;
     while (true) {
         read(fs, buffer, block_size);
-        lseek(fs, block_size, SEEK_CUR);
         cur_size += block_size;
         if (cur_size > file_size) break;
     }
@@ -32,9 +31,8 @@ int read_cache(char *filename, long long int file_size) {
         start = rdtsc_start();
         read(fs, buffer, block_size);
         end = rdtsc_end();
-        sum += (end - start) / 1000 / 2.6;
+        sum += (end - start) / 2.6 / 1000;
         num_blocks += 1;
-        lseek(fs, block_size, SEEK_CUR);
         cur_size += block_size;
         if (cur_size > file_size) break;
     }

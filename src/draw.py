@@ -1,7 +1,7 @@
 # Draw figure for experiment result
 import matplotlib.pyplot as plt
 
-if __name__ == "__main__":
+def memory_access():
     arraySize = [12]
     for i in range(19):
         arraySize.append(arraySize[-1]+1)
@@ -33,4 +33,42 @@ if __name__ == "__main__":
     plt.legend()
     plt.xlabel("log2(array size)")
     plt.ylabel("latency in clock cycle")
+    plt.show()
+
+def cache():
+    file_cache = [1, 6, 7, 8, 9, 9.5, 9.6, 9.7, 9.8, 9.9, 10, 11, 12]
+    time = [1.049783, 0.959863, 0.978759, 1.025051, 0.994991, 0.875161, 3.626067, 14.710172, 56.652123, 86.926884, 89.926884, 89.488876, 90.569231]
+    plt.figure()
+    plt.plot(file_cache, time)
+    plt.xlabel('File Size(GB)')
+    plt.ylabel('Mean Block Read Time(us)')
+    plt.grid()
+    plt.show()
+
+def local():
+    file_size = [4, 8, 16, 32, 64, 128, 256]
+    sequential = [54.141351, 52.341241, 50.174325, 48.234134, 49.139134, 48.747345, 49.673035]
+    random = [97.566387, 94.177359, 99.263165, 96.462161, 99.423593, 94.234253, 90.134135]
+    plt.plot(file_size, sequential, label='sequential')
+    plt.plot(file_size, random, label='random')
+    plt.legend()
+    plt.xlabel("File Size(MB)")
+    plt.xscale('log', basex=2)
+    plt.yscale('log', basey=2)
+    plt.ylabel("Mean block read time(us)")
+    plt.grid()
+    plt.show()
+
+if __name__ == "__main__":
+    file_size = [4, 8, 16, 32, 64, 128, 256]
+    sequential = [6711.201260, 6447.229500, 6253.721463, 6084.938512, 5849.451241, 6532.234623, 6385.523342]
+    random = [8129.270066, 7754.246239, 7321.237235, 7296.647243, 6711.201260, 7485.769907, 7122.998203]
+    plt.plot(file_size, sequential, label='sequential')
+    plt.plot(file_size, random, label='random')
+    plt.legend()
+    plt.xlabel("File Size(MB)")
+    plt.xscale('log', basex=2)
+    plt.yscale('log', basey=10)
+    plt.ylabel("Remote Mean block read time(us)")
+    plt.grid()
     plt.show()
